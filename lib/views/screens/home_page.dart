@@ -10,8 +10,8 @@ import 'package:hungry/views/widgets/dummy_search_bar.dart';
 import 'package:hungry/views/widgets/recipe_tile.dart';
 
 class HomePage extends StatelessWidget {
-  final List<Recipe> newlyPostedRecipe = RecipeHelper.newlyPostedRecipe;
-
+  final Future<List<Recipe>> newlyPostedRecipe = RecipeHelper.getNewlyPostedRecipes();
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
           'BetterBites',
           style: TextStyle(
             color: AppColor.secondary,
-            fontFamily: 'inter',
+            fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -102,7 +102,7 @@ class HomePage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'inter',
+                        fontFamily: 'Inter',
                       ),
                     ),
                     TextButton(
@@ -122,18 +122,35 @@ class HomePage extends StatelessWidget {
                     ),
                   ],
                 ),
-                // Content
-                ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: newlyPostedRecipe.length,
-                  physics: NeverScrollableScrollPhysics(),
-                  separatorBuilder: (context, index) {
-                    return SizedBox(height: 16);
-                  },
-                  itemBuilder: (context, index) {
-                    return RecipeTile(
-                      data: newlyPostedRecipe[index],
-                    );
+                // Content - Use FutureBuilder to display newly posted recipes
+                FutureBuilder<List<Recipe>>(
+                  future: newlyPostedRecipe,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(child: Text('No newly posted recipes found.'));
+                    } else {
+                      
+                      List<Recipe> recipes = snapshot.data!;
+                      
+                      return ListView.separated(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: recipes.length,
+                        separatorBuilder: (context, index) {
+                          return SizedBox(height: 16);
+                        },
+                        itemBuilder: (context, index) {
+                          print(recipes[index]);
+                          return RecipeTile(
+                            data: recipes[index],
+                          );
+                        },
+                      );
+                    }
                   },
                 ),
               ],

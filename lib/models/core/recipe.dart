@@ -3,7 +3,8 @@ class Recipe {
   String? photo;
   String? time;
   String? description;
-
+  String? id;
+  
   List<String>? ingredients; // Changed to List<String>
   List<TutorialStep>? tutorial;
   ClimateFootprint? climateFootprint;
@@ -12,8 +13,11 @@ class Recipe {
   String? servingSize;
   String? calories;
   Map<String, List<String>>? nutrients;
+  
+
 
   Recipe({
+    this.id,
     this.title,
     this.photo,
     this.time,
@@ -29,6 +33,7 @@ class Recipe {
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
     return Recipe(
+      id: json['id'] as String?,
       title: json['title'] as String?,
       photo: json['photo'] as String?,
       time: json['time'] as String?,

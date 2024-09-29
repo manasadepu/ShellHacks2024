@@ -1,6 +1,5 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:hungry/views/screens/bookmarks_page.dart';
 import 'package:hungry/views/screens/camera_page.dart'; // Import the new CameraPage
 import 'package:hungry/views/screens/home_page.dart';
 import 'package:hungry/views/screens/profile_page.dart';

@@ -12,7 +12,10 @@ class RecipeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => RecipeDetailPage(recipeId: "Nature Valley Peanut Granola Bar: hackathon attendee")));
+        // Navigate to the detail page with the correct recipe ID
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => RecipeDetailPage(recipeId: data.id!),
+        ));
       },
       child: Container(
         height: 90,
@@ -30,8 +33,21 @@ class RecipeTile extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
                 color: Colors.blueGrey,
-                image: DecorationImage(image: AssetImage(data.photo!), fit: BoxFit.cover),
+                image: data.photo != null
+                    ? DecorationImage(
+                        image: NetworkImage(data.photo!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
+              child: data.photo == null
+                  ? Center(
+                      child: Icon(
+                        Icons.image_not_supported,
+                        color: Colors.white,
+                      ),
+                    )
+                  : null,
             ),
             // Recipe Info
             Expanded(
@@ -46,29 +62,36 @@ class RecipeTile extends StatelessWidget {
                     Container(
                       margin: EdgeInsets.only(bottom: 12),
                       child: Text(
-                        data.title!,
-                        style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'inter'),
+                        data.title ?? 'Untitled Recipe',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Inter',
+                          fontSize: 14,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     // Recipe Calories and Time
                     Row(
                       children: [
-                        SvgPicture.asset(
-                          'assets/icons/fire-filled.svg',
-                          color: Colors.black,
-                          width: 12,
-                          height: 12,
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(left: 5),
-                          child: Text(
-                            data.calories!,
-                            style: TextStyle(fontSize: 12),
+                        if (data.calories != null) ...[
+                          SvgPicture.asset(
+                            'assets/icons/fire-filled.svg',
+                            color: Colors.black,
+                            width: 12,
+                            height: 12,
                           ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
+                          Container(
+                            margin: EdgeInsets.only(left: 5),
+                            child: Text(
+                              data.calories!,
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                        ],
                       ],
                     ),
                   ],

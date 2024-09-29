@@ -13,18 +13,20 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   TextEditingController searchInputController = TextEditingController();
-  final List<Recipe> searchResult = RecipeHelper.searchResultRecipe;
+  final Future<List<Recipe>> newlyPostedRecipe = RecipeHelper.getNewlyPostedRecipes();
 
   @override
   Widget build(BuildContext context) {
-    print(searchInputController.text.isEmpty);
     return Scaffold(
       appBar: AppBar(
         brightness: Brightness.dark,
         backgroundColor: AppColor.primary,
         elevation: 0,
         centerTitle: true,
-        title: Text('Search Recipe', style: TextStyle(fontFamily: 'inter', fontWeight: FontWeight.w400, fontSize: 16)),
+        title: Text(
+          'Search Recipe',
+          style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w400, fontSize: 16),
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
@@ -56,12 +58,14 @@ class _SearchPageState extends State<SearchPage> {
                         child: Container(
                           height: 50,
                           margin: EdgeInsets.only(right: 15),
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: AppColor.primarySoft),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: AppColor.primarySoft,
+                          ),
                           child: TextField(
                             controller: searchInputController,
                             onChanged: (value) {
-                              print(searchInputController.text);
-                              setState(() {});
+                              setState(() {}); // Refresh UI when search input changes
                             },
                             style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400),
                             maxLines: 1,
@@ -74,7 +78,7 @@ class _SearchPageState extends State<SearchPage> {
                               focusedBorder: InputBorder.none,
                               border: InputBorder.none,
                               prefixIcon: Visibility(
-                                visible: (searchInputController.text.isEmpty) ? true : false,
+                                visible: searchInputController.text.isEmpty,
                                 child: Container(
                                   margin: EdgeInsets.only(left: 10, right: 12),
                                   child: SvgPicture.asset(
@@ -93,12 +97,18 @@ class _SearchPageState extends State<SearchPage> {
                       GestureDetector(
                         onTap: () {
                           showModalBottomSheet(
-                              context: context,
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-                              builder: (context) {
-                                return SearchFilterModal();
-                              });
+                            context: context,
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20),
+                              ),
+                            ),
+                            builder: (context) {
+                              return SearchFilterModal();
+                            },
+                          );
                         },
                         child: Container(
                           width: 50,
@@ -110,11 +120,11 @@ class _SearchPageState extends State<SearchPage> {
                           ),
                           child: SvgPicture.asset('assets/icons/filter.svg'),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
-                // Search Keyword Recommendation
+                // Search Keyword Recommendation (Currently static)
                 Container(
                   height: 60,
                   margin: EdgeInsets.only(top: 8),
@@ -129,15 +139,18 @@ class _SearchPageState extends State<SearchPage> {
                     },
                     itemBuilder: (context, index) {
                       return Container(
-
                         alignment: Alignment.topCenter,
                         child: TextButton(
                           onPressed: () {
                             searchInputController.text = "temp";
+                            setState(() {});
                           },
                           child: Text(
                             "temp",
-                            style: TextStyle(color: Colors.white.withOpacity(0.7), fontWeight: FontWeight.w400),
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(color: Colors.white.withOpacity(0.15), width: 1),
@@ -165,17 +178,41 @@ class _SearchPageState extends State<SearchPage> {
                     style: TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                 ),
-                ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: searchResult.length,
-                  physics: NeverScrollableScrollPhysics(),
-                  separatorBuilder: (context, index) {
-                    return SizedBox(height: 16);
-                  },
-                  itemBuilder: (context, index) {
-                    return RecipeTile(
-                      data: searchResult[index],
-                    );
+                FutureBuilder<List<Recipe>>(
+                  future: newlyPostedRecipe,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(child: Text('No recipes found.'));
+                    } else {
+                      List<Recipe> recipes = snapshot.data!;
+                      // Filter the recipes based on search input
+                      List<Recipe> filteredRecipes = recipes.where((recipe) {
+                        String searchText = searchInputController.text.toLowerCase();
+                        return recipe.title != null && recipe.title!.toLowerCase().contains(searchText);
+                      }).toList();
+
+                      if (filteredRecipes.isEmpty) {
+                        return Center(child: Text('No recipes matched your search.'));
+                      }
+
+                      return ListView.separated(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: filteredRecipes.length,
+                        separatorBuilder: (context, index) {
+                          return SizedBox(height: 16);
+                        },
+                        itemBuilder: (context, index) {
+                          return RecipeTile(
+                            data: filteredRecipes[index],
+                          );
+                        },
+                      );
+                    }
                   },
                 ),
               ],
