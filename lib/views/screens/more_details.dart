@@ -132,11 +132,65 @@ class _MoreDetailsPageState extends State<MoreDetailsPage> {
     if (ingredientData == null || ingredientData.isEmpty) {
       return Text('No ingredients found.');
     }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return ListView(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(), // Disable scrolling within the ListView
       children: ingredientData.map<Widget>((ingredient) {
-        return Text('• $ingredient');
+        return _buildIngredientTile(ingredient);
       }).toList(),
+    );
+  }
+
+  Widget _buildIngredientTile(Map<String, dynamic> ingredient) {
+    return ExpansionTile(
+      title: Text(
+        ingredient['ingredient_name'] ?? 'Unknown Ingredient', 
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+      ),
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTextRow('Description: ', ingredient['description']),
+              _buildTextRow('Benefits: ', ingredient['benefits']),
+              _buildTextRow('Detriments: ', ingredient['detriments']),
+              _buildTextRow('Conclusion: ', ingredient['conclusion']),
+              ingredient['allergy_warning'] == true
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        'Allergy Warning: This ingredient may cause an allergic reaction.',
+                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  : Container(), // Empty container if no allergy warning
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextRow(String label, String? value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Expanded(
+            child: Text(
+              value ?? 'Unknown',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
