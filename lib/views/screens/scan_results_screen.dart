@@ -17,7 +17,7 @@ Color getBarColor(String nutrientName) {
       return Colors.orange;
     case 'Trans Fat':
       return Colors.red;
-    case 'Sat. Fat':
+    case 'Saturated Fat':
       return Colors.deepOrange;
     case 'Sugar':
       return Colors.pink;
