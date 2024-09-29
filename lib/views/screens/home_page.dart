@@ -11,7 +11,7 @@ import 'package:hungry/views/widgets/recipe_tile.dart';
 
 class HomePage extends StatelessWidget {
   final Future<List<Recipe>> newlyPostedRecipe = RecipeHelper.getNewlyPostedRecipes();
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,7 +133,9 @@ class HomePage extends StatelessWidget {
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return Center(child: Text('No newly posted recipes found.'));
                     } else {
+                      
                       List<Recipe> recipes = snapshot.data!;
+                      
                       return ListView.separated(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
@@ -142,6 +144,7 @@ class HomePage extends StatelessWidget {
                           return SizedBox(height: 16);
                         },
                         itemBuilder: (context, index) {
+                          print(recipes[index]);
                           return RecipeTile(
                             data: recipes[index],
                           );
