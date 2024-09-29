@@ -25,7 +25,7 @@ class HomePage extends StatelessWidget {
           ),
         ),
         showProfilePhoto: true,
-        profilePhoto: AssetImage('assets/images/ProfilePicture.jpg'),
+        profilePhoto: AssetImage('assets/images/josephpp.jpeg'),
         profilePhotoOnPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => ProfilePage()),

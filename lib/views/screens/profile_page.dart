@@ -3,10 +3,18 @@ import 'package:hungry/views/utils/AppColor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserInfoTile extends StatelessWidget {
-  final String label, value;
+  final String label;
+  final dynamic value; // Accepts String or int
   final EdgeInsetsGeometry? margin, padding;
   final Color? valueBackground;
-  UserInfoTile({required this.label, required this.value, this.padding, this.margin, this.valueBackground});
+
+  UserInfoTile({
+    required this.label,
+    required this.value,
+    this.padding,
+    this.margin,
+    this.valueBackground,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,20 +27,31 @@ class UserInfoTile extends StatelessWidget {
         children: [
           Padding(
             padding: EdgeInsets.only(left: 20),
-            child: Text('$label', style: TextStyle(color: AppColor.primary, fontSize: 12)),
+            child: Text(
+              '$label',
+              style: TextStyle(color: AppColor.primary, fontSize: 12),
+            ),
           ),
           Container(
             margin: EdgeInsets.only(top: 6),
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.all(16),
             color: valueBackground ?? AppColor.primaryExtraSoft,
-            child: Text('$value', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'inter')),
-          )
+            child: Text(
+              '${value.toString()}',  // Convert value to String, regardless of its type
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'inter',
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
+
 
 class UserInfoChips extends StatelessWidget {
   final String label;
@@ -84,7 +103,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String _email = '';
   String _fullName = '';
-  String _age = '';
+  int _age = 0;
   String _sex = '';
   String _height = '';
   String _weight = '';
@@ -103,7 +122,7 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _email = prefs.getString('email') ?? '';
       _fullName = prefs.getString('name') ?? '';
-      _age = prefs.getString('age') ?? '';
+      _age = prefs.getInt('age')!;
       _sex = prefs.getString('sex') ?? '';
       String heightFeet = prefs.getString('heightFeet') ?? '0';
       String heightInches = prefs.getString('heightInches') ?? '0';
@@ -176,7 +195,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       borderRadius: BorderRadius.circular(100),
                       // Profile Picture
                       image: DecorationImage(
-                        image: AssetImage('assets/images/ProfilePicture.jpg'),
+                        image: AssetImage('assets/images/josephpp.jpeg'),
                         fit: BoxFit.cover,
                       ),
                     ),

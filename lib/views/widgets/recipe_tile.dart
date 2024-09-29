@@ -69,18 +69,6 @@ class RecipeTile extends StatelessWidget {
                         SizedBox(
                           width: 10,
                         ),
-                        Icon(
-                          Icons.alarm,
-                          size: 14,
-                          color: Colors.black,
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(left: 5),
-                          child: Text(
-                            data.time!,
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ),
                       ],
                     ),
                   ],

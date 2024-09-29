@@ -170,9 +170,9 @@ var sweetFoodRecommendationRecipeRawData = [
 ];
 var newlyPostedRecipeRawData = [
   {
-    'title': 'Avocado Toast with Poached Eggs',
-    'photo': 'assets/images/newly_posted1.jpg',
-    'calories': '500 Cal',
+    'title': 'Nutella & Go',
+    'photo': 'assets/images/Nutella.png',
+    'calories': '260 Cal',
     'time': '20 min',
     'description': 'A simple yet delicious avocado toast topped with perfectly poached eggs.',
     'servings_per_container': '1',
@@ -212,9 +212,9 @@ var newlyPostedRecipeRawData = [
       {'username': '@foodie', 'review': 'Simple and tasty.'},
     ],
   }, {
-    'title': 'Vegetable Noodle Bowl',
-    'photo': 'assets/images/featured1.jpg',
-    'calories': '870 Cal',
+    'title': 'Nature Valley Sweet & Salty Nut',
+    'photo': 'assets/images/NatureValley.png',
+    'calories': '160 Cal',
     'time': '32 min',
     'description': 'A hearty bowl of noodles loaded with fresh vegetables.',
     'servings_per_container': '2',
@@ -254,9 +254,9 @@ var newlyPostedRecipeRawData = [
       {'username': '@veggieLover', 'review': 'A perfect meal for vegetarians.'},
     ],
   }, {
-    'title': 'Vegetable Noodle Bowl',
-    'photo': 'assets/images/featured1.jpg',
-    'calories': '870 Cal',
+    'title': 'Baked Cheetos',
+    'photo': 'assets/images/Cheetos.png',
+    'calories': '120 Cal',
     'time': '32 min',
     'description': 'A hearty bowl of noodles loaded with fresh vegetables.',
     'servings_per_container': '2',
