@@ -67,7 +67,7 @@ class _MoreDetailsPageState extends State<MoreDetailsPage> {
     // Set up the request body for the POST request
     var requestBody = json.encode({
       'text': ingredientDataString, // Pass the raw ingredient data string
-      'allergens': 'unknown', // Modify as needed to pass actual allergen information
+      'allergens': 'Peanuts, Dairy', // Modify as needed to pass actual allergen information
     });
 
     try {
@@ -162,7 +162,7 @@ class _MoreDetailsPageState extends State<MoreDetailsPage> {
   // Updated Ingredient Section - Displays each ingredient in a list
   Widget _buildIngredientSection() {
     if (ingredientList.isEmpty) {
-      return Center(child: Text('No ingredient information available.'));
+      return Center(child: Text('Processing Information...'));
     }
 
     return ListView.builder(
