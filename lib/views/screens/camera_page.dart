@@ -97,11 +97,11 @@ class _CameraPageState extends State<CameraPage> {
       try {
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('http://10.0.2.2:5000/perform_nutrition_ingredient_and_product_OCR'),
+          Uri.parse('http://10.108.246.91:5000/perform_nutrition_ingredient_and_product_OCR'),
         );
-        request.files.add(await http.MultipartFile.fromPath('nutrition_file', "assets/images/nutritionfacts_img.jpg"));
-        request.files.add(await http.MultipartFile.fromPath('ingredient_file', "assets/images/ingredients_img.jpg"));
-        request.files.add(await http.MultipartFile.fromPath('product_file', "assets/images/front_img.jpg"));
+        request.files.add(await http.MultipartFile.fromPath('nutrition_file', nutritionImage!.path));
+        request.files.add(await http.MultipartFile.fromPath('ingredient_file', ingredientsImage!.path));
+        request.files.add(await http.MultipartFile.fromPath('product_file', productImage!.path)); // Add the product image
 
         var response = await request.send();
 
@@ -109,6 +109,7 @@ class _CameraPageState extends State<CameraPage> {
           var responseData = await response.stream.bytesToString();
           var decodedData = json.decode(responseData);
           print(decodedData);
+          debugPrint("HERE");
 
           // Navigate to the recipes page with the response data
           Navigator.pushReplacement(

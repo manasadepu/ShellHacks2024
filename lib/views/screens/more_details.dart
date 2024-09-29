@@ -13,12 +13,14 @@ class MoreDetailsPage extends StatefulWidget {
 
 class _MoreDetailsPageState extends State<MoreDetailsPage> {
   Map<String, dynamic>? structuredNutritionData;
+  List<dynamic> ingredientList = []; // To store the list of ingredients
 
   @override
   void initState() {
     super.initState();
-    // Automatically call the API with nutrition data when the page loads
+    // Automatically call the APIs when the page loads
     _getStructuredNutritionFacts();
+    _getIngredientInfo();
   }
 
   Future<void> _getStructuredNutritionFacts() async {
@@ -56,41 +58,67 @@ class _MoreDetailsPageState extends State<MoreDetailsPage> {
     }
   }
 
+  Future<void> _getIngredientInfo() async {
+    var ingredientData = widget.apiResponse['ingredient_data'];
+
+    // Convert the ingredientData to a string
+    String ingredientDataString = ingredientData.toString();
+
+    // Set up the request body for the POST request
+    var requestBody = json.encode({
+      'text': ingredientDataString, // Pass the raw ingredient data string
+      'allergens': 'unknown', // Modify as needed to pass actual allergen information
+    });
+
+    try {
+      // Make POST request to Flask API for ingredient information
+      var response = await http.post(
+        Uri.parse('http://10.108.246.91:5000/get_ingredient_info'),
+        headers: {"Content-Type": "application/json"},
+        body: requestBody,
+      );
+
+      if (response.statusCode == 200) {
+        // Parse the response JSON and update the ingredient list
+        var responseData = json.decode(response.body);
+        setState(() {
+          ingredientList = responseData['result']['ingredients'];
+        });
+      } else {
+        setState(() {
+          ingredientList = [];
+        });
+      }
+    } catch (e) {
+      setState(() {
+        ingredientList = [];
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Extract the ingredient and product recognition data
-    var ingredientData = widget.apiResponse['ingredient_data']['ingredients'];
+    // Extract the product recognition data
     var productRecognition = widget.apiResponse['product_recognition'];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('More Details'),
-        backgroundColor: Colors.teal,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return DefaultTabController(
+      length: 3, // We have 3 tabs
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('More Details'),
+          backgroundColor: Colors.teal,
+          bottom: TabBar(
+            tabs: [
+              Tab(text: 'Nutrition Data'),
+              Tab(text: 'Ingredients'),
+              Tab(text: 'Product Recognition'),
+            ],
+          ),
+        ),
+        body: TabBarView(
           children: [
-            Text(
-              'Nutrition Data',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
             _buildNutritionSection(),
-            Divider(),
-            Text(
-              'Ingredients',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            _buildIngredientSection(ingredientData),
-            Divider(),
-            Text(
-              'Product Recognition',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
+            _buildIngredientSection(), // Updated to display the ingredients list
             _buildProductRecognitionSection(productRecognition),
           ],
         ),
@@ -104,40 +132,46 @@ class _MoreDetailsPageState extends State<MoreDetailsPage> {
       return Center(child: CircularProgressIndicator());
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Recommendation: ${structuredNutritionData!["recommendation"]}'),
-        Text('Servings per Container: ${structuredNutritionData!["servings_per_container"]}'),
-        Text('Serving Size: ${structuredNutritionData!["serving_size"]}'),
-        Text('Calories: ${structuredNutritionData!["calories"]}'),
-        SizedBox(height: 10),
-        Text(
-          'Nutrients:',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: structuredNutritionData!["nutrients"].map<Widget>((nutrient) {
-            return Text(
-              '${nutrient["name"]}: ${nutrient["amount"]} (${nutrient["daily_value"]}%)',
-            );
-          }).toList(),
-        ),
-      ],
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Recommendation: ${structuredNutritionData!["recommendation"]}'),
+          Text('Servings per Container: ${structuredNutritionData!["servings_per_container"]}'),
+          Text('Serving Size: ${structuredNutritionData!["serving_size"]}'),
+          Text('Calories: ${structuredNutritionData!["calories"]}'),
+          SizedBox(height: 10),
+          Text(
+            'Nutrients:',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: structuredNutritionData!["nutrients"].map<Widget>((nutrient) {
+              return Text(
+                '${nutrient["name"]}: ${nutrient["amount"]} (${nutrient["daily_value"]}%)',
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildIngredientSection(List<dynamic> ingredientData) {
-    if (ingredientData == null || ingredientData.isEmpty) {
-      return Text('No ingredients found.');
+  // Updated Ingredient Section - Displays each ingredient in a list
+  Widget _buildIngredientSection() {
+    if (ingredientList.isEmpty) {
+      return Center(child: Text('No ingredient information available.'));
     }
-    return ListView(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(), // Disable scrolling within the ListView
-      children: ingredientData.map<Widget>((ingredient) {
+
+    return ListView.builder(
+      padding: EdgeInsets.all(16.0),
+      itemCount: ingredientList.length,
+      itemBuilder: (context, index) {
+        var ingredient = ingredientList[index];
         return _buildIngredientTile(ingredient);
-      }).toList(),
+      },
     );
   }
 
@@ -196,25 +230,31 @@ class _MoreDetailsPageState extends State<MoreDetailsPage> {
 
   Widget _buildProductRecognitionSection(Map<String, dynamic> productRecognition) {
     if (productRecognition == null) {
-      return Text('No product recognition data.');
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text('No product recognition data.'),
+      );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Web Entities:'),
-        ...productRecognition['web_entities'].map<Widget>((entity) {
-          return Text('• ${entity["description"]} (Score: ${entity["score"]})');
-        }).toList(),
-        SizedBox(height: 10),
-        Text('Visually Similar Images:'),
-        ...productRecognition['visually_similar_images'].map<Widget>((imageUrl) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: Image.network(imageUrl),
-          );
-        }).toList(),
-      ],
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Web Entities:'),
+          ...productRecognition['web_entities'].map<Widget>((entity) {
+            return Text('• ${entity["description"]} (Score: ${entity["score"]})');
+          }).toList(),
+          SizedBox(height: 10),
+          Text('Visually Similar Images:'),
+          ...productRecognition['visually_similar_images'].map<Widget>((imageUrl) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Image.network(imageUrl),
+            );
+          }).toList(),
+        ],
+      ),
     );
   }
 }

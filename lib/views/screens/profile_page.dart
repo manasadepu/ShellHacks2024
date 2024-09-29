@@ -195,8 +195,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       borderRadius: BorderRadius.circular(100),
                       // Profile Picture
                       image: DecorationImage(
-                        image: AssetImage('assets/images/josephpp.jpeg'),
-                        fit: BoxFit.cover,
+                        image: AssetImage('assets/images/ProfilePicture.jpg'),
                       ),
                     ),
                   ),
