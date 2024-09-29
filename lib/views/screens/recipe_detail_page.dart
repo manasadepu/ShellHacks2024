@@ -20,7 +20,7 @@ class RecipeDetailPage extends StatefulWidget {
 }
 
 class _RecipeDetailPageState extends State<RecipeDetailPage>
-     with TickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _scrollController;
 
@@ -187,8 +187,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                 SliverToBoxAdapter(
                   child: Container(
                     width: MediaQuery.of(context).size.width,
-                    padding:
-                        EdgeInsets.only(top: 20, bottom: 30, left: 16, right: 16),
+                    padding: EdgeInsets.only(
+                        top: 20, bottom: 30, left: 16, right: 16),
                     color: AppColor.primary,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,8 +206,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                               margin: EdgeInsets.only(left: 5),
                               child: Text(
                                 recipe.calories ?? '',
-                                style:
-                                    TextStyle(color: Colors.white, fontSize: 12),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 12),
                               ),
                             ),
                             SizedBox(width: 10),
@@ -216,8 +216,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                               margin: EdgeInsets.only(left: 5),
                               child: Text(
                                 recipe.time ?? '',
-                                style:
-                                    TextStyle(color: Colors.white, fontSize: 12),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 12),
                               ),
                             ),
                           ],
@@ -271,8 +271,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                   // Ingredients Tab
                   Padding(
                       padding: const EdgeInsets.all(3.0),
-                      child:
-                          IngredientsWidget(ingredients: recipe.ingredients ?? [])),
+                      child: IngredientsWidget(
+                          ingredients: recipe.ingredients ?? [])),
                   // Health Tab
                   Padding(
                     padding: const EdgeInsets.all(5.0),
@@ -292,7 +292,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
     );
   }
 }
-
 
 // Custom SliverPersistentHeaderDelegate for TabBar
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
@@ -386,7 +385,7 @@ class _NutrientBarChartState extends State<NutrientBarChart>
         return Colors.orange;
       case 'Trans Fat':
         return Colors.red;
-      case 'Sat. Fat':
+      case 'Saturated Fat':
         return Colors.deepOrange;
       case 'Sugar':
         return Colors.pink;
@@ -431,7 +430,8 @@ class _NutrientBarChartState extends State<NutrientBarChart>
                         double dailyValue =
                             widget.data[group.x.toInt()].dailyValue;
                         double percentage = (value / dailyValue) * 100;
-                        percentage = percentage.clamp(0, 120); // Limit the value
+                        percentage =
+                            percentage.clamp(0, 120); // Limit the value
 
                         return BarTooltipItem(
                           '$nutrient\n${value.toStringAsFixed(1)} (${percentage.toStringAsFixed(1)}%)',
@@ -443,13 +443,12 @@ class _NutrientBarChartState extends State<NutrientBarChart>
                       if (!event.isInterestedForInteractions ||
                           barTouchResponse == null ||
                           barTouchResponse.spot == null) {
-                        setState(() {
-                          
-                        });
+                        setState(() {});
                         return;
                       }
                       setState(() {
-                        _touchedIndex = barTouchResponse.spot!.touchedBarGroupIndex;
+                        _touchedIndex =
+                            barTouchResponse.spot!.touchedBarGroupIndex;
                         _touchedNutrient = widget.data[_touchedIndex!];
                       });
                     },
@@ -461,9 +460,14 @@ class _NutrientBarChartState extends State<NutrientBarChart>
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (double value, TitleMeta meta) {
-                          final labels = widget.data.map((e) => e.name).toList();
+                          final labels = widget.data
+                              .map((e) => e.name == 'Saturated Fat'
+                                  ? 'Sat. Fat'
+                                  : e.name)
+                              .toList();
                           final index = value.toInt();
-                          if (index < 0 || index >= labels.length) return Container();
+                          if (index < 0 || index >= labels.length)
+                            return Container();
                           return SideTitleWidget(
                             axisSide: meta.axisSide,
                             space: 4,
@@ -496,8 +500,10 @@ class _NutrientBarChartState extends State<NutrientBarChart>
                     NutrientData nutrient = entry.value;
 
                     // Calculate the percentage of the daily value
-                    double percentage = (nutrient.value / nutrient.dailyValue) * 100;
-                    percentage = percentage.clamp(0, 120); // Limit the value for display
+                    double percentage =
+                        (nutrient.value / nutrient.dailyValue) * 100;
+                    percentage =
+                        percentage.clamp(0, 120); // Limit the value for display
 
                     return BarChartGroupData(
                       x: index,
@@ -539,8 +545,7 @@ class _NutrientBarChartState extends State<NutrientBarChart>
               children: [
                 Text(
                   '${_touchedNutrient!.name}',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 SizedBox(height: 4),
                 Text(
@@ -548,7 +553,7 @@ class _NutrientBarChartState extends State<NutrientBarChart>
                   style: TextStyle(fontSize: 14),
                 ),
                 Text(
-                  'Daily Intake: ${( _touchedNutrient!.value / _touchedNutrient!.dailyValue * 100).toStringAsFixed(1)}%',
+                  'Daily Intake: ${(_touchedNutrient!.value / _touchedNutrient!.dailyValue * 100).toStringAsFixed(1)}%',
                   style: TextStyle(fontSize: 14),
                 ),
               ],
